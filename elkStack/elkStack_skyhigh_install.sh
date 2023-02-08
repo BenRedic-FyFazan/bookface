@@ -48,4 +48,5 @@ sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.ym
 ## Disabling for easier install
 # sudo systemctl restart elasticsearch
 
-
+# Installing the rest
+./elkLogstash_install.sh
