@@ -9,6 +9,9 @@ gnupg \
 lsb-release \
 net-tools \
 
+# Pulling git repo
+sudo git clone https://github.com/BenRedic-FyFazan/bookface.git
+
 # Installing https transport and java runtime environment
 sudo apt update
 sudo apt install apt-transport-https
@@ -31,17 +34,18 @@ echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://arti
 # Installing elasticSearch
 sudo apt-get update && sudo apt-get install elasticsearch
 sudo systemctl enable elasticsearch
-sudo systemctl start elasticsearch
+
+## Disabling for easier install
+# sudo systemctl start elasticsearch
 
 ## DID DEPLOY CHECK WORK?! IT WORKS
 
-# Installing git and getting the required files
-git clone https://github.com/BenRedic-FyFazan/bookface.git
-cd bookface/elkStack/
-
 # configuring elkStack
+cd .bookface/elkStack/
 sudo rm /etc/elasticsearch/elasticsearch.yml
 sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-sudo systemctl restart elasticsearch
+
+## Disabling for easier install
+# sudo systemctl restart elasticsearch
 
 
