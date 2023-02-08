@@ -30,22 +30,24 @@ echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://arti
 | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 
 # Installing elasticSearch
-sudo apt-get update && sudo apt-get install elasticsearch
+sudo apt-get update && sudo apt-get install elasticsearch -y
 sudo systemctl start elasticsearch
+sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch
 
 # Logstash
-sudo apt-get install logstash
-sudo systemctl start logstash
-sudo systemctl enable logstash
+#sudo apt-get install logstash -y
+#sudo systemctl start logstash
+#sudo systemctl daemon-reload
+#sudo systemctl enable logstash
 
 # Kibana
-sudo apt-get install kibana
-sudo systemctl start kibana
-sudo systemctl enable kibana
+#sudo apt-get install kibana -y
+#sudo systemctl start kibana
+#sudo systemctl enable kibana
 
 # Filebeat
-sudo apt-get install filebeat
+#sudo apt-get install filebeat -y
 
 ## DID DEPLOY CHECK WORK?! IT WORKS
 
@@ -61,26 +63,37 @@ sudo rm /etc/elasticsearch/elasticsearch.yml
 sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 # jvm_max size
 sudo cp code/elasticSearch/jvm_heap_size.options /etc/elasticsearch/jvm.options.d/jvm_heap_size.options
+sudo systemctl restart elasticsearch
 
 # Logstash config
-## None atm
+sudo apt-get install logstash -y
+sudo systemctl start logstash
+sudo systemctl daemon-reload
+sudo systemctl enable logstash
 
 # Kibana config
+sudo apt-get install kibana -y 
+sudo systemctl start kibana 
+sudo systemctl daemon-reload
+sudo systemctl enable kibana
 cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/kibana/kibana.yml
 sudo cp code/kibana/kibana.yml /etc/kibana/kibana.yml
 sudo systemctl restart kibana
 
 # Filebeat config
+sudo apt-get install filebeat -y
 cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/filebeat/filebeat.yml
 sudo cp code/filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 sudo filebeat modules enable system
 ## loading filebeat index
+
 sudo filebeat setup --index-managementsudo filebeat setup \
  --index-management -E output.logstash.enabled=false \
 -E 'output.elasticsearch.hosts=["0.0.0.0:9200"]'
 sudo systemctl start filebeat
+sudo systemctl daemon-reload
 sudo systemctl enable filebeat
 
 ## Disabling for easier install
