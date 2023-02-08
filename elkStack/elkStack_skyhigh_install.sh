@@ -10,7 +10,7 @@ lsb-release \
 net-tools \
 
 # Pulling git repo and navigating to home
-cd home/ubuntu/
+cd /home/ubuntu/
 sudo git clone https://github.com/BenRedic-FyFazan/bookface.git
 
 # Installing https transport and java runtime environment
