@@ -41,7 +41,7 @@ cd bookface/elkStack/
 
 # configuring elkStack
 sudo rm /etc/elasticsearch/elasticsearch.yml
-sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch.yml
+sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 sudo systemctl restart elasticsearch
 
 
