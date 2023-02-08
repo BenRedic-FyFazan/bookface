@@ -99,7 +99,7 @@ sudo systemctl start filebeat
 
 sudo systemctl enable filebeat
 
-To verify: curl -XGET http://192.168.133.12:9200/_cat/indices?v
+To verify: curl -XGET http://192.168.131.169:9200/_cat/indices?v
 
 # Accessing kibana dashboard
 http://192.168.133.12:5601

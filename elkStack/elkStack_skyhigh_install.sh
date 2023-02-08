@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 sudo apt-get update -y
 sudo apt-get install -y \
@@ -31,19 +31,21 @@ echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://arti
 
 # Installing elasticSearch
 sudo apt-get update && sudo apt-get install elasticsearch
+sudo systemctl start elasticsearch
 sudo systemctl enable elasticsearch
 
 # Logstash
 sudo apt-get install logstash
+sudo systemctl start logstash
 sudo systemctl enable logstash
 
 # Kibana
 sudo apt-get install kibana
+sudo systemctl start kibana
 sudo systemctl enable kibana
 
-# Firebeat
+# Filebeat
 sudo apt-get install filebeat
-sudo systemctl enable firebeat
 
 ## DID DEPLOY CHECK WORK?! IT WORKS
 
@@ -67,19 +69,20 @@ sudo cp code/elasticSearch/jvm_heap_size.options /etc/elasticsearch/jvm.options.
 cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/kibana/kibana.yml
 sudo cp code/kibana/kibana.yml /etc/kibana/kibana.yml
+sudo systemctl restart kibana
 
 # Filebeat config
 cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/filebeat/filebeat.yml
 sudo cp code/filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 sudo filebeat modules enable system
-
 ## loading filebeat index
 sudo filebeat setup --index-managementsudo filebeat setup \
  --index-management -E output.logstash.enabled=false \
 -E 'output.elasticsearch.hosts=["0.0.0.0:9200"]'
-
+sudo systemctl start filebeat
 sudo systemctl enable filebeat
+
 ## Disabling for easier install
 # sudo systemctl start elasticsearch
 # sudo systemctl start logstash
