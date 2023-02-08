@@ -42,10 +42,11 @@ sudo systemctl enable elasticsearch
 ## DID DEPLOY CHECK WORK?! IT WORKS
 
 # configuring elkStack
-cd .bookface/elkStack/
+cd ./bookface/elkStack/
 sudo rm /etc/elasticsearch/elasticsearch.yml
 sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-
+# jvm_max size
+sudo cp code/elasticSearch/jvm_heap_size.options /etc/elasticsearch/jvm.options.d/jvm_heap_size.options
 ## Disabling for easier install
 # sudo systemctl restart elasticsearch
 

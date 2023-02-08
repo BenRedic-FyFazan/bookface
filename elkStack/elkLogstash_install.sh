@@ -13,11 +13,13 @@ sudo systemctl enable kibana
 #sudo systemctl start kibana
 
 # Kibana config
+cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/kibana/kibana.yml
 sudo cp code/kibana/kibana.yml /etc/kibana/kibana.yml
 
 # Firebeat
 sudo apt-get install filebeat
+cd /home/ubuntu/bookface/elkStack/
 sudo rm /etc/filebeat/filebeat.yml
 sudo cp code/filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 sudo filebeat modules enable system
