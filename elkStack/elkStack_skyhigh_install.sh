@@ -6,9 +6,10 @@ git \
 ca-certificates \ 
 curl \ 
 gnupg \ 
-lsb-release \
-net-tools \
-unzip
+lsb-release 
+
+sudo apt install net-tools 
+sudo apt install unzip
 
 ## INSTALLATION
 # Installing https transport and java runtime environment
@@ -44,8 +45,8 @@ sudo git clone https://github.com/BenRedic-FyFazan/bookface.git
 
 # elkStack config
 cd ./bookface/elkStack/
-#sudo rm /etc/elasticsearch/elasticsearch.yml
-#sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+sudo rm /etc/elasticsearch/elasticsearch.yml
+sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 # jvm_max size
 sudo cp code/elasticSearch/jvm_heap_size.options /etc/elasticsearch/jvm.options.d/jvm_heap_size.options
 #sudo systemctl restart elasticsearch
@@ -81,7 +82,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable filebeat
 
 ## Certificates
-cd /home/ubuntu/bookface/elkStack
+#cd /home/ubuntu/bookface/elkStack
 ./elkCerts_setup_pt1.sh
 ./elkCerts_setup_pt2.sh
 

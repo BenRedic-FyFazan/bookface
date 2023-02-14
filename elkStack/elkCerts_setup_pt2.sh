@@ -1,5 +1,7 @@
 #!/bin/bash -x
-## Gets ip address
+## Required for keytool
+sudo apt install -y openjdk-17-jre-headless 
+## Getting ip address to variable
 ip4=$(/sbin/ip -o -4 addr list ens3 | awk '{print $4}' | cut -d/ -f1)
 
 cd /usr/share/elasticsearch
@@ -10,8 +12,7 @@ cd /usr/share/elasticsearch
 # Made changes, need to update these comments
 printf 'n\ny\n \
 /usr/share/elasticsearch/elastic-stack-ca.p12\nadmin1\n \
-5y\ny\nnode-1\nelkStack\nlocalhost\n\n\ny\n%s\n127.0.0.1\n\ny\nn\nn\n \
-admin1\n\n\n' $ip4 \
+5y\ny\nnode-1\nelkStack\nlocalhost\n\n\ny\n%s\n127.0.0.1\n\ny\nn\nn\nadmin1\nadmin1\n\n' $ip4 \
 | sudo ./bin/elasticsearch-certutil http
 
 # Unzipping, moving, setting rights and copying http.p12
@@ -24,13 +25,19 @@ printf 'y\nadmin1\n' | sudo ./bin/elasticsearch-keystore add xpack.security.http
 # Moving, setting rights and copying elasticsearch-ca.pem 
 sudo mv ./kibana/elasticsearch-ca.pem /etc/elasticsearch/elasticsearch-ca.pem
 sudo chmod 664 /etc/elasticsearch/elasticsearch-ca.pem
-sudo cp /etc/elasticsearch/elasticsearch-ca.p12 /etc/kibana/elasticsearch-ca.p12
+sudo cp /etc/elasticsearch/elasticsearch-ca.pem /etc/kibana/elasticsearch-ca.pem
 
+# Elastic password
+printf 'y\nsuperuser\nsuperuser\n' \
+| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u elastic
 
+# kibana password
+printf 'y\nkibanauser\nkibanauser\n' \
+| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u kibana_system
 
-# Kibana password
-#printf 'y\n' | sudo /usr/share/kibana/bin/kibana-keystore create
-#printf 'ELEASTICPASSWORD' | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+printf 'y\n' | sudo /usr/share/kibana/bin/kibana-keystore create
+printf 'superuser\n' | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+sudo chown root:kibana /usr/share/kibana/bin/kibana-keystore
 
 sudo echo "server.port: 5601" \
 | sudo tee -a /etc/kibana/kibana.yml
