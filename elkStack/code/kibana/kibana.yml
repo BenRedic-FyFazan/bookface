@@ -99,17 +99,17 @@ server.host: "0.0.0.0"
 #logging.root.level: debug
 
 # Enables you to specify a file where Kibana stores log output.
-#logging:
-#  appenders:
-#    file:
-#      type: file
-#      fileName: /var/log/kibana/kibana.log
-#      layout:
-#        type: json
-#  root:
-#    appenders:
-#      - default
-#      - file
+logging:
+  appenders:
+    file:
+      type: file
+      fileName: /var/log/kibana/kibana.log
+      layout:
+        type: json
+  root:
+    appenders:
+      - default
+      - file
 #  layout:
 #    type: json
 
@@ -133,7 +133,7 @@ server.host: "0.0.0.0"
 #path.data: data
 
 # Specifies the path where Kibana creates the process ID file.
-#pid.file: /run/kibana/kibana.pid
+pid.file: /run/kibana/kibana.pid
 
 # Set the interval in milliseconds to sample system and process performance
 # metrics. Minimum is 100ms. Defaults to 5000ms.

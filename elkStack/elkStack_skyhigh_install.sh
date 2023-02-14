@@ -7,7 +7,8 @@ ca-certificates \
 curl \ 
 gnupg \ 
 lsb-release \
-net-tools 
+net-tools \
+unzip
 
 ## INSTALLATION
 # Installing https transport and java runtime environment

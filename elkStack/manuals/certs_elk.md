@@ -97,3 +97,5 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/security-basic-s
     - "password to private key": use same as above: admin1
     
     
+CERTIFICATE GUIDE:
+https://github.com/bvader/howtos/blob/master/basic-security-elasticsearch/README.md

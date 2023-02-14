@@ -4,16 +4,73 @@ ip4=$(/sbin/ip -o -4 addr list ens3 | awk '{print $4}' | cut -d/ -f1)
 
 cd /usr/share/elasticsearch
 
-printf 'n\ny\n/usr/share/elasticsearch/elastic-stack-ca.p12\nadmin1\n5y\nn\nnode-1\n\ny\n%s\n\ny\nn\nadmin1\nadmin1\n\n' $ip4 \
- | sudo ./bin/elasticsearch-certutil http
+# Generate CSR -> Use an existing CA?
+# CA path -> Password for CA -> 
+# Cert validity period -> certificate per node -> nodename -> hostnames
+# Made changes, need to update these comments
+printf 'n\ny\n \
+/usr/share/elasticsearch/elastic-stack-ca.p12\nadmin1\n \
+5y\ny\nnode-1\nelkStack\nlocalhost\n\n\ny\n%s\n127.0.0.1\n\ny\nn\nn\n \
+admin1\n\n\n' $ip4 \
+| sudo ./bin/elasticsearch-certutil http
 
+# Unzipping, moving, setting rights and copying http.p12
 sudo unzip elasticsearch-ssl-http.zip 
 sudo mv ./elasticsearch/http.p12 /etc/elasticsearch/http.p12
+sudo chmod 664 /etc/elasticsearch/http.p12
+sudo cp /etc/elasticsearch/http.p12 /etc/kibana/http.p12
 printf 'y\nadmin1\n' | sudo ./bin/elasticsearch-keystore add xpack.security.http.ssl.keystore.secure_password
 
-sudo mv ./kibana/elasticsearch-ca.pem /etc/kibana/elasticsearch-ca.pem
-echo "elasticsearch.ssl.certificateAuthorities: /etc/kibana/elasticsearch-ca.pem" \
+# Moving, setting rights and copying elasticsearch-ca.pem 
+sudo mv ./kibana/elasticsearch-ca.pem /etc/elasticsearch/elasticsearch-ca.pem
+sudo chmod 664 /etc/elasticsearch/elasticsearch-ca.pem
+sudo cp /etc/elasticsearch/elasticsearch-ca.p12 /etc/kibana/elasticsearch-ca.p12
+
+
+
+# Kibana password
+#printf 'y\n' | sudo /usr/share/kibana/bin/kibana-keystore create
+#printf 'ELEASTICPASSWORD' | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+
+sudo echo "server.port: 5601" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "server.host: 0.0.0.0" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "server.ssl.enabled: true" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "server.ssl.keystore.path: /etc/kibana/http.p12" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "server.ssl.keystore.password: ''" \
 | sudo tee -a /etc/kibana/kibana.yml
 
 sudo echo "elasticsearch.hosts: https://${ip4}:9200" \
 | sudo tee -a /etc/kibana/kibana.yml
+
+echo "elasticsearch.ssl.certificateAuthorities: /etc/kibana/elasticsearch-ca.pem" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "pid.file: /run/kibana/kibana.pid" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "xpack.encryptedSavedObjects.encryptionKey: 'salkdjfhasldfkjhasdlfkjhasdflkasjdfhslkajfhasldkfjhasdlaksdjfh'" \
+| sudo tee -a /etc/kibana/kibana.yml
+
+## Create password and keystore for kibana?
+
+
+## NOT NEEDED
+#printf '\n' | sudo ./bin/elasticsearch-certutil csr -name kibana-server -dns $ip4
+#sudo unzip csr-bundle.zip
+#sudo mv ./kibana-server/kibana-server.csr /etc/kibana/kibana-server.csr
+#sudo mv ./kibana-server/kibana-server.key /etc/kibana/kibana-server.key
+#
+#
+#echo "server.ssl.certificate: /etc/kibana/kibana-server.crt" \
+#| sudo tee -a /etc/kibana/kibana.yml
+#
+#echo "server.ssl.key: /etc/kibana/kibana-server.key" \
+#| sudo tee -a /etc/kibana/kibana.yml
