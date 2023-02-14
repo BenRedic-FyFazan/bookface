@@ -45,8 +45,8 @@ sudo git clone https://github.com/BenRedic-FyFazan/bookface.git
 
 # elkStack config
 cd ./bookface/elkStack/
-sudo rm /etc/elasticsearch/elasticsearch.yml
-sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+#sudo rm /etc/elasticsearch/elasticsearch.yml
+#sudo cp code/elasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 # jvm_max size
 sudo cp code/elasticSearch/jvm_heap_size.options /etc/elasticsearch/jvm.options.d/jvm_heap_size.options
 #sudo systemctl restart elasticsearch

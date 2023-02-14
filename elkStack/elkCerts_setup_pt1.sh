@@ -20,6 +20,6 @@ printf 'y\nadmin1\n' \
 | sudo ./bin/elasticsearch-keystore add \
 xpack.security.http.ssl.keystore.secure_password
 
-printf 'y\nadmin1\n' \
+printf 'admin1\n' \
 | sudo ./bin/elasticsearch-keystore add \
 xpack.security.http.ssl.truststore.secure_password

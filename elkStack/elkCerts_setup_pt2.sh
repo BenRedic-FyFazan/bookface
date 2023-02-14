@@ -22,10 +22,18 @@ sudo chmod 664 /etc/elasticsearch/http.p12
 sudo cp /etc/elasticsearch/http.p12 /etc/kibana/http.p12
 printf 'y\nadmin1\n' | sudo ./bin/elasticsearch-keystore add xpack.security.http.ssl.keystore.secure_password
 
+#printf 'y\nadmin1\n' | sudo /usr/share/kibana/bin/kibana-keystore add xpack.security.server.ssl.keystore.secure_password
+
+#xpack.security.http.ssl.keystore.secure_password
+
 # Moving, setting rights and copying elasticsearch-ca.pem 
 sudo mv ./kibana/elasticsearch-ca.pem /etc/elasticsearch/elasticsearch-ca.pem
 sudo chmod 664 /etc/elasticsearch/elasticsearch-ca.pem
 sudo cp /etc/elasticsearch/elasticsearch-ca.pem /etc/kibana/elasticsearch-ca.pem
+
+## STARTING ELASTIC
+sudo systemctl daemon-reload
+sudo systemctl start elasticsearch
 
 # Elastic password
 printf 'y\nsuperuser\nsuperuser\n' \
@@ -36,8 +44,12 @@ printf 'y\nkibanauser\nkibanauser\n' \
 | sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u kibana_system
 
 printf 'y\n' | sudo /usr/share/kibana/bin/kibana-keystore create
-printf 'superuser\n' | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
 sudo chown root:kibana /usr/share/kibana/bin/kibana-keystore
+printf 'superuser\n' | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+
+sudo echo "elasticsearch.username: 'kibana_system'" | sudo tee -a /etc/kibana/kibana.yml
+
+sudo echo "elasticsearch.password: 'kibanauser'" | sudo tee -a /etc/kibana/kibana.yml
 
 sudo echo "server.port: 5601" \
 | sudo tee -a /etc/kibana/kibana.yml
@@ -51,7 +63,7 @@ sudo echo "server.ssl.enabled: true" \
 sudo echo "server.ssl.keystore.path: /etc/kibana/http.p12" \
 | sudo tee -a /etc/kibana/kibana.yml
 
-sudo echo "server.ssl.keystore.password: ''" \
+sudo echo "server.ssl.keystore.password: 'admin1'" \
 | sudo tee -a /etc/kibana/kibana.yml
 
 sudo echo "elasticsearch.hosts: https://${ip4}:9200" \
