@@ -40,7 +40,7 @@ server.host: "0.0.0.0"
 
 # =================== System: Elasticsearch ===================
 # The URLs of the Elasticsearch instances to use for all your queries.
-elasticsearch.hosts: ["http://localhost:9200"]
+#elasticsearch.hosts: ["http://localhost:9200"]
 
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana
@@ -99,17 +99,17 @@ elasticsearch.hosts: ["http://localhost:9200"]
 #logging.root.level: debug
 
 # Enables you to specify a file where Kibana stores log output.
-logging:
-  appenders:
-    file:
-      type: file
-      fileName: /var/log/kibana/kibana.log
-      layout:
-        type: json
-  root:
-    appenders:
-      - default
-      - file
+#logging:
+#  appenders:
+#    file:
+#      type: file
+#      fileName: /var/log/kibana/kibana.log
+#      layout:
+#        type: json
+#  root:
+#    appenders:
+#      - default
+#      - file
 #  layout:
 #    type: json
 
@@ -133,7 +133,7 @@ logging:
 #path.data: data
 
 # Specifies the path where Kibana creates the process ID file.
-pid.file: /run/kibana/kibana.pid
+#pid.file: /run/kibana/kibana.pid
 
 # Set the interval in milliseconds to sample system and process performance
 # metrics. Minimum is 100ms. Defaults to 5000ms.
@@ -172,3 +172,4 @@ pid.file: /run/kibana/kibana.pid
 # Maximum number of documents loaded by each shard to generate autocomplete suggestions.
 # This value must be a whole number greater than zero. Defaults to 100_000
 #unifiedSearch.autocomplete.valueSuggestions.terminateAfter: 100000
+
