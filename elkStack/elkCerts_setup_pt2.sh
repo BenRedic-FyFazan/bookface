@@ -32,16 +32,16 @@ sudo chmod 664 /etc/elasticsearch/elasticsearch-ca.pem
 sudo cp /etc/elasticsearch/elasticsearch-ca.pem /etc/kibana/elasticsearch-ca.pem
 
 ## STARTING ELASTIC
-sudo systemctl daemon-reload
-sudo systemctl start elasticsearch
+#sudo systemctl daemon-reload
+#sudo systemctl start elasticsearch
 
 # Elastic password
-printf 'y\nsuperuser\nsuperuser\n' \
-| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u elastic
+#printf 'y\nsuperuser\nsuperuser\n' \
+#| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u elastic
 
 # kibana password
-printf 'y\nkibanauser\nkibanauser\n' \
-| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u kibana_system
+#printf 'y\nkibanauser\nkibanauser\n' \
+#| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u kibana_system
 
 sudo echo "y" | sudo /usr/share/kibana/bin/kibana-keystore create
 sudo chown root:kibana /usr/share/kibana/bin/kibana-keystore
@@ -75,6 +75,20 @@ echo "elasticsearch.ssl.certificateAuthorities: /etc/kibana/elasticsearch-ca.pem
 
 sudo echo "xpack.encryptedSavedObjects.encryptionKey: 'salkdjfhasldfkjhasdlfkjhasdflkasjdfhslkajfhasldkfjhasdlaksdjfh'" \
 | sudo tee -a /etc/kibana/kibana.yml
+
+## STARTING ELASTIC
+sudo systemctl daemon-reload
+sudo systemctl start elasticsearch
+
+# Elastic password
+printf 'y\nsuperuser\nsuperuser\n' \ 
+| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u elastic
+
+# kibana password
+printf 'y\nkibanauser\nkibanauser\n' \
+| sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u kibana_system
+
+
 
 ## Create password and keystore for kibana?
 
