@@ -72,9 +72,6 @@ sudo echo "elasticsearch.hosts: https://${ip4}:9200" \
 echo "elasticsearch.ssl.certificateAuthorities: /etc/kibana/elasticsearch-ca.pem" \
 | sudo tee -a /etc/kibana/kibana.yml
 
-sudo echo "pid.file: /run/kibana/kibana.pid" \
-| sudo tee -a /etc/kibana/kibana.yml
-
 sudo echo "xpack.encryptedSavedObjects.encryptionKey: 'salkdjfhasldfkjhasdlfkjhasdflkasjdfhslkajfhasldkfjhasdlaksdjfh'" \
 | sudo tee -a /etc/kibana/kibana.yml
 

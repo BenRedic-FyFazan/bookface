@@ -70,7 +70,7 @@ path.logs: /var/log/elasticsearch
 
 ## We're running a single node
 #discovery.seed_hosts: []
-#discovery.type: single-node
+discovery.type: single-node
 #
 # Bootstrap the cluster using an initial set of master-eligible nodes:
 #
