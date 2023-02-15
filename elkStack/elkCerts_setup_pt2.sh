@@ -46,7 +46,8 @@ printf 'y\nkibanauser\nkibanauser\n' \
 sudo echo "y" | sudo /usr/share/kibana/bin/kibana-keystore create
 sudo chown root:kibana /usr/share/kibana/bin/kibana-keystore
 
-sudo echo "kibanauser" | sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password
+sudo echo "kibanauser" \
+| sudo /usr/share/kibana/bin/kibana-keystore add elasticsearch.password --stdin
 
 sudo echo "elasticsearch.username: 'kibana_system'" | sudo tee -a /etc/kibana/kibana.yml
 
