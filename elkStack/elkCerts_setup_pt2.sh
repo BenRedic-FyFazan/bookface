@@ -77,8 +77,10 @@ echo "elasticsearch.ssl.certificateAuthorities: /etc/kibana/elasticsearch-ca.pem
 sudo echo "xpack.encryptedSavedObjects.encryptionKey: 'salkdjfhasldfkjhasdlfkjhasdflkasjdfhslkajfhasldkfjhasdlaksdjfh'" \
 | sudo tee -a /etc/kibana/kibana.yml
 
+## STARTING KIBANA
+sudo systemctl daemon-reload
+sudo systemctl start kibana
 
-## Create password and keystore for kibana?
 
 
 ## NOT NEEDED
