@@ -31,40 +31,17 @@ Knytter containeren til et docker-nettverk
 sudo docker run -it -d \
 --name bookface1 \
 -v /home/ubuntu/bookface/bookface/code:/var/www/html \
+-v /home/ubuntu/bookface/bookface/apache2.conf:/etc/apache2/apache2.conf \
+-v /var/log/apache2:/var/log/apache2 \
 -p 49001:80 \
-bookface
-
-**Container www1con2**
-sudo docker run -it -d \
---name bookface2 \
--v /home/ubuntu/bookface/bookface/code:/var/www/html \
--p 49002:80 \
-bookface
-
-**Container www1con3**
-sudo docker run -it -d \
---name bookface3 \
--v /home/ubuntu/bookface/bookface/code:/var/www/html \
--p 49003:80 \
 bookface
 
 **Container www2con1**
 sudo docker run -it -d \
 --name bookface1 \
 -v /home/ubuntu/bookface/bookface/code:/var/www/html \
+-v /home/ubuntu/bookface/bookface/apache2.conf:/etc/apache2/apache2.conf \
+-v /var/log/apache2:/var/log/apache2 \
 -p 49001:80 \
 bookface
 
-**Container www2con2**
-sudo docker run -it -d \
---name bookface2 \
--v /home/ubuntu/bookface/bookface/code:/var/www/html \
--p 49002:80 \
-bookface
-
-**Container www2con3**
-sudo docker run -it -d \
---name bookface3 \
--v /home/ubuntu/bookface/bookface/code:/var/www/html \
--p 49003:80 \
-bookface
