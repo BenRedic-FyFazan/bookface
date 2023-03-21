@@ -1,4 +1,4 @@
-version: '3.3'
+version: '0.1'
 
 configs:
   bf_config:
@@ -13,7 +13,7 @@ networks:
 
 services:
   web:
-    image: 192.168.128.23:5000/bf:v17
+    image: docker.io/karlhenh/bf:v0.1
     
     configs:
       - source: bf_config
@@ -37,13 +37,6 @@ services:
       
     deploy:
       replicas: 3
-
-  memcache:
-    image: memcached
-    restart: always
-    
-    networks:
-      - bf
 
   db_balance:
     image: haproxy
