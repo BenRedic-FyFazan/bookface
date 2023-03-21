@@ -14,7 +14,7 @@ if ($memcache) {
     $picture_of_user = $memcache->get($key);
 
     if ( !$picture_of_user) {
-        $picture_of_user = file_get_contents('/images/' . $image);
+        $picture_of_user = file_get_contents(__DIR__.'/images/' . $image);
     }
 
     if ($picture_of_user) {
@@ -27,7 +27,7 @@ if ($memcache) {
 } else {
     $picture_of_user = file_get_contents('/images/' . $image);
 }
-
+header('Content-Type: image/jpeg');
 echo $picture_of_user;
 
 

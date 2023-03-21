@@ -12,7 +12,7 @@ networks:
 
 services:
   web:
-    image: karlhenh/bf:v0.2
+    image: karlhenh/bf:v0.3
     configs:
       - source: bf_config
         target: /var/www/html/config.php
