@@ -9,7 +9,6 @@ $use_file_store_for_images = 0;
 $frontpage_cutoff_days = "";
 $fast_random_search = 0;
 $fast_cutoff_search = 0;
-$memcache_picture_duration = 3600;
 
 $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -286,23 +285,8 @@ try {
 	    echo "<tr>\n";
 	    echo "\t<! userline: " . $res['userid'] . ">\n";
 
-        $key = "picture_" . trim($res['picture']);
-        if ( $memcache ){
-            $picture_of_user = $memcache->get($key);
-            if (!$picture_of_user) $picture_of_user = NULL;
-
-        } else {
-            $picture_of_user = NULL;
-        }
-
-	    if ( $picture_of_user ) {
-            echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='" . $picture_of_user . "'></a></td>\n";
-
-	    } else if ( $use_file_store_for_images ) {
-            $picture_of_user = file_get_contents('/images/' . trim($res['picture']));
-            if ( $memcache ) $memcache->set($key, $picture_of_user,0,$memcache_picture_duration);
-            echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='" . $picture_of_user . "'></a></td>\n";
-
+        if ( $use_file_store_for_images ) {
+            echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='/filestoreImage.php?image=" . trim($res['picture']) . "'></a></td>\n";
         } else {
 	        echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='/showimage.php?user=" . trim($res['userid']) . "'></a></td>\n";
 	    }

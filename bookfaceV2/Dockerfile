@@ -17,6 +17,7 @@ RUN rm /var/www/html/index.html
 RUN mkdir /var/www/html/images
 ADD code/* /var/www/html/
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY memcached.conf /etc/memcached.conf
 ADD init.sh /
 ADD config.php.docker /var/www/html/config.php
 
