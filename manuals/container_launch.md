@@ -40,7 +40,7 @@ bookface
 sudo docker run -it -d \
 --name bookface1 \
 -v /home/ubuntu/bookface/bookface/code:/var/www/html \
--v /home/ubuntu/bookface/bookface/apache2.conf:/etc/apache2/apache2.conf \
+-v /home/ubuntu/bookface/bookface/apache2:/etc/apache2/ \
 -v /var/log/apache2:/var/log/apache2 \
 -p 49001:80 \
 bookface

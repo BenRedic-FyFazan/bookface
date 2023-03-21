@@ -1,0 +1,61 @@
+version: '3.3'
+
+configs:
+  bf_config:
+    file: ./config.php.swarm
+
+  haproxy_config:
+    file: ./haproxy.cfg
+
+networks:
+  bf:
+    attachable: true
+
+services:
+  web:
+    image: 192.168.128.23:5000/bf:v17
+    
+    configs:
+      - source: bf_config
+        target: /var/www/html/config.php
+    ports:
+      - "80:80"
+    networks:
+        - bf
+    volumes:
+        - type: bind
+          source: /bf_images
+          target: /var/www/html/images
+
+    environment:
+      BF_MEMCACHE_SERVER: 127.0.0.1
+      BF_DB_HOST: db_balance
+      BF_DB_PORT: 26257
+      BF_DB_USER: bfuser
+      BF_DB_NAME: bf
+      BF_FRONTPAGE_LIMIT: 500
+      
+    deploy:
+      replicas: 3
+
+  memcache:
+    image: memcached
+    restart: always
+    
+    networks:
+      - bf
+
+  db_balance:
+    image: haproxy
+    
+    restart: always
+
+    configs:
+      - source: haproxy_config
+        target: /usr/local/etc/haproxy/haproxy.cfg
+
+    networks:
+      - bf
+
+    ports:
+      - "1936:1936"
