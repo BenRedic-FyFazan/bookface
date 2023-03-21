@@ -9,6 +9,7 @@ $use_file_store_for_images = 0;
 $frontpage_cutoff_days = "";
 $fast_random_search = 0;
 $fast_cutoff_search = 0;
+$memcache_picture_duration = 3600;
 
 $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -141,31 +142,26 @@ try {
     }
     
     if ( isset($memcache_enabled) and $memcache_enabled == 1 and ! $memcache_override ){
-	echo "<! Memcache is enabled !>";
-	$memcache = new Memcache();
-	$memcache->addServer ( $memcache_server,"11211" );
+	    echo "<! Memcache is enabled !>";
+	    $memcache = new Memcache();
+	    $memcache->addServer ( $memcache_server,"11211" );
     }
 
     $memcache_for_random = 1;
     $memcache_for_counters = 1;
-    #			echo "Correct database found<br>\n";
+    # echo "Correct database found<br>\n";
 
     ### Users
     if (  isset($memcache_enabled) and $memcache_enabled == 1 and $memcache_for_random ){
         echo "<! using memcache for randomized users !>\n";
         $random_user = $memcache->get("random_user_id");
         if ( $random_user < 1){
-	    
-	    $random_user = get_random_user($dbh);
-	    
-            $memcache->set("random_user_id", $random_user,0,30); 
+	        $random_user = get_random_user($dbh);
+            $memcache->set("random_user_id", $random_user,0,30);
         }
         echo "<! Random poster: " . $random_user . " !>\n";
 
-        
-    } else {
-        echo "<! Random poster: " . get_random_user($dbh) . " !>\n";
-    }
+    } else echo "<! Random poster: " . get_random_user($dbh) . " !>\n";
 
     ### POST and USER
     if (  isset($memcache_enabled) and $memcache_enabled == 1 and $memcache_for_random ){
@@ -247,109 +243,118 @@ try {
     echo "<h2>Latest activity</h2>\n";
 
     if ( isset($memcache_enabled) and $memcache_enabled == 1 and $memcache ){
-	$user_list_for_front_page = $memcache->get("user_list_for_front_page");
+	    $user_list_for_front_page = $memcache->get("user_list_for_front_page");
     }
     
     if ( empty($user_list_for_front_page) ) {
- 	$sql = "";
+ 	    $sql = "";
         if ( isset($frontpage_cutoff_days) and $frontpage_cutoff_days ){
             # get date for X days since cutoff
-#            $cutoff = date('Y-m-d', strtotime('-' . $frontpage_cutoff_days .' days', strtotime(date())));
+            # $cutoff = date('Y-m-d', strtotime('-' . $frontpage_cutoff_days .' days', strtotime(date())));
             $cutoff = date("Y-m-d", strtotime("-" . $frontpage_cutoff_days . " days"));
             echo "<! cutoff date: " . $cutoff . "!>\n";
             $sql = "select userID,name,status,posts,comments,lastPostDate,picture from users where ( lastPostDate >= '" . $cutoff . "' ) order by lastPostDate desc";
         } else {
-	    $sql = "select userID,name,status,posts,comments,lastPostDate,picture from users order by lastPostDate desc";
-	}
-	if ( isset($frontpage_limit) ){
-	    $sql = $sql . " limit $frontpage_limit";
-	}
-	# $res = $dbh->query($sql);
-	foreach ($dbh->query($sql) as $rec)
-	  $user_list_for_front_page[] = $rec;
+	        $sql = "select userID,name,status,posts,comments,lastPostDate,picture from users order by lastPostDate desc";
+	    }
+	    if ( isset($frontpage_limit) ){
+	        $sql = $sql . " limit $frontpage_limit";
+	    }
+
+	    # $res = $dbh->query($sql);
+	    foreach ($dbh->query($sql) as $rec) {
+            $user_list_for_front_page[] = $rec;
+        }
     }
+
     // cache for 10 minutes
     if ( isset($memcache) and $memcache ){
-	$memcache->set("user_list_for_front_page", $user_list_for_front_page,0,60);
+	    $memcache->set("user_list_for_front_page", $user_list_for_front_page,0,60);
     }	
 
     echo "<table class=row >\n";
     echo "<tr><td></td><td>Name:</td><td>Posts</td></tr>\n";
     $alternator = 0;
+
     foreach ( $user_list_for_front_page as $res ){
-	$style = "class=row";
-	if ( $alternator % 2 ){
-	    $style = "class=lightrow";					
-	}
-	$alternator++;
-	
-	echo "<tr>\n";
-	echo "\t<! userline: " . $res['userid'] . ">\n";
-
-    $key = "picture_of_" . $res['userid'];
-    if ( $memcache ){
-        $picture_of_user = $memcache->get($key);
-    }
-
-	if ($picture_of_user) {
-        echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='data:image/png;base64," . $picture_of_user . "'></a></td>\n";
-	} else if ($use_file_store_for_images) {
-        echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='/images/" . trim($res['picture']) . "'></a></td>\n";
-    } else {
-	    echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='/showimage.php?user=" . trim($res['userid']) . "'></a></td>\n";
-	}
-
-	echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'>" . trim($res['name']) . "</a></td>\n";	
-	echo "\t<td $style >" . $res['posts'] . "</td>\n";
-	echo "</tr>\n";
-	
-	if ( $res['posts'] > 0 ){
-	    # show latest post
-
-	    echo "<tr>\n";
-	    $latest_post_by_user = array();
-	    if ( isset($memcache) and $memcache ){
-		$latest_post_by_user = $memcache->get("latest_post_by_" . $res['userid']);
-		
-		if (empty($latest_post_by_user)){
-		    echo "\t<! No memcache object found: latest_post_by_" . $res['userid'] . ", fetching from DB instead !>\n";
-		    $latest_post_by_user = array();
-		    $sql = "select postid,text,postdate,image from posts where userid = '" . $res['userid'] . "' order by postdate desc LIMIT 1;";
-		    $latest_post_query = $dbh->query($sql);		  
-		    $latest_post_by_user = $latest_post_query->fetch(PDO::FETCH_ASSOC);
-		    // cache for an hour
-		    if ( isset($memcache) and $memcache ){
-			echo "\t<! Storing into memcache for next time: latest_post_by_" . $res['userid'] . " : " . $latest_post_by_user['text'] . " !>\n";  
-			$memcache->set("latest_post_by_" . $res['userid'], $latest_post_by_user,0,3600);
-		    }
-		}
-	    } else {
-		$sql = "select postid,text,postdate,image from posts where userid = '" . $res['userid'] . "' order by postdate desc LIMIT 1;";
-		$latest_post_query = $dbh->query($sql);		  
-		$latest_post_by_user = $latest_post_query->fetch(PDO::FETCH_ASSOC);
+	    $style = "class=row";
+	    if ( $alternator % 2 ){
+	        $style = "class=lightrow";
 	    }
-	    echo "\t<td colspan=3 >\n";
-	    echo "\t<table>\n";
-	    echo "\t\t<! postID:". $latest_post_by_user['postid'] . " !>\n";
+	    $alternator++;
+	
+	    echo "<tr>\n";
+	    echo "\t<! userline: " . $res['userid'] . ">\n";
+
+        $key = "picture_" . trim($res['picture']);
+        if ( $memcache ){
+            $picture_of_user = $memcache->get($key);
+            if (!$picture_of_user) $picture_of_user = NULL;
+
+        } else {
+            $picture_of_user = NULL;
+        }
+
+	    if ( $picture_of_user ) {
+            echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='" . $picture_of_user . "'></a></td>\n";
+
+	    } else if ( $use_file_store_for_images ) {
+            $picture_of_user = file_get_contents('/images/' . trim($res['picture']));
+            if ( $memcache ) $memcache->set($key, $picture_of_user,0,$memcache_picture_duration);
+            echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='" . $picture_of_user . "'></a></td>\n";
+
+        } else {
+	        echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'><img src='/showimage.php?user=" . trim($res['userid']) . "'></a></td>\n";
+	    }
+
+	    echo "\t<td $style ><a href='/showuser.php?user=" . $res['userid']. "'>" . trim($res['name']) . "</a></td>\n";
+	    echo "\t<td $style >" . $res['posts'] . "</td>\n";
+	    echo "</tr>\n";
+	
+	    if ( $res['posts'] > 0 ){
+	        # show latest post
+
+	        echo "<tr>\n";
+	        $latest_post_by_user = array();
+	        if ( isset($memcache) and $memcache ){
+		        $latest_post_by_user = $memcache->get("latest_post_by_" . $res['userid']);
+		
+		        if (empty($latest_post_by_user)){
+		            echo "\t<! No memcache object found: latest_post_by_" . $res['userid'] . ", fetching from DB instead !>\n";
+		            $latest_post_by_user = array();
+		            $sql = "select postid,text,postdate,image from posts where userid = '" . $res['userid'] . "' order by postdate desc LIMIT 1;";
+		            $latest_post_query = $dbh->query($sql);
+		            $latest_post_by_user = $latest_post_query->fetch(PDO::FETCH_ASSOC);
+		            // cache for an hour
+                    echo "\t<! Storing into memcache for next time: latest_post_by_" . $res['userid'] . " : " . $latest_post_by_user['text'] . " !>\n";
+                    $memcache->set("latest_post_by_" . $res['userid'], $latest_post_by_user,0,3600);
+
+		        }
+	        } else {
+		        $sql = "select postid,text,postdate,image from posts where userid = '" . $res['userid'] . "' order by postdate desc LIMIT 1;";
+		        $latest_post_query = $dbh->query($sql);
+		        $latest_post_by_user = $latest_post_query->fetch(PDO::FETCH_ASSOC);
+	        }
+	        echo "\t<td colspan=3 >\n";
+	        echo "\t<table>\n";
+	        echo "\t\t<! postID:". $latest_post_by_user['postid'] . " !>\n";
             echo "\t\t<tr><td>" . $latest_post_by_user['postdate'] . "</td><td>" . $latest_post_by_user['text'] . "</td></tr>\n";
 	    
 
 
-	    if( $latest_post_by_user['image'] ){
-		echo "\t\t<! image for post: " . $latest_post_by_user['image'] . ">\n";
-		if ( $use_file_store_for_images ){
-		    echo "\t\t<tr><td colspan=2 ><img src='/images/" . trim($latest_post_by_user['image']) . "'></td></tr>\n";
-		} else {
-		    echo "\t\t<tr><td colspan=2 ><img src='/postimage.php?image=" . trim($latest_post_by_user['image']) . "'></td></tr>\n";
-		}		
+            if( $latest_post_by_user['image'] ){
+		        echo "\t\t<! image for post: " . $latest_post_by_user['image'] . ">\n";
+		        if ( $use_file_store_for_images ){
+		            echo "\t\t<tr><td colspan=2 ><img src='/images/" . trim($latest_post_by_user['image']) . "'></td></tr>\n";
+		        } else {
+		            echo "\t\t<tr><td colspan=2 ><img src='/postimage.php?image=" . trim($latest_post_by_user['image']) . "'></td></tr>\n";
+		        }
+	        }
+	        echo "\t</table>\n";
+	        echo "\t</td>\n";
+	        echo "</tr>\n";
 	    }
-	    echo "\t</table>\n";
-	    echo "\t</td>\n";
-	    echo "</tr>\n";
-
-	}
 	
-
     }
     echo "</table>\n";
     $totaltime = time() - $starttime;
