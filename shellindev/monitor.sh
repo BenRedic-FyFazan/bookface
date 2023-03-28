@@ -14,6 +14,7 @@ discMsg (){
 
 
 #Reboots a instance given it's name:
+#TODO: Jump out of loop after x tries
 rebootVM(){
 	local INDEX=1
 	while [ "$(openstack server show "$1" -f value -c status)" == "SHUTOFF" ]; do
@@ -22,18 +23,24 @@ rebootVM(){
 		((INDEX=INDEX+1))
 	done
 	discMsg "$1 is now rebooted"
-
+	
 }
 
 #Goes trough each element in SERVER_DATA and checks status:
 while read -r Name Status; do
 	case $Status in
 		"ACTIVE")
+			#TODO: Check for running processes on DB
 			#discMsg "$Name is online!"
+			 #if [[$Name == *"db_cluster"* ]]; then
+		        #       IPADDR=$(openstack server show $Name -f value -c addresses | grep -o -P "192(\.\d{1,3}){3}")
+        		#
+        		#       ssh user@$IPADDR "echo \"do something\""
+        		#fi		
 		;;
 		
        		"SHUTOFF")
-			if [ "$Name" != "backup" ]; then
+			if [ "$Name" != "backup" ] && [ "$Name" != "db2_test" ]; then
 				rebootVM "$Name"
 			fi
 		;;
@@ -43,11 +50,6 @@ while read -r Name Status; do
 		;;
 	esac
 
-	#if [[$Name == *"db_node"* ]]; then
-	#	IPADDR=$(openstack server show $Name -f value -c addresses | grep -o -P "192(\.\d{1,3}){3}")
-	#
-	#	ssh user@$IPADDR "echo \"do something\""
-	#fi
 
 done <<< "$SERVER_DATA"
 
